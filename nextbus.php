@@ -10,6 +10,9 @@ function findNextBus(string $route, string $stop, string $direction) : void {
     $direction_name = ucfirst($direction) . 'bound';
     $direction_id = getDirectionIdForRouteIdAndDirection($route_id, $direction_name);
     echo $direction_id . PHP_EOL;
+    $place_code = getPlaceCodeForRouteIdDirectionIdAndPlaceDescription($route_id, $direction_id, $stop);
+    echo $place_code . PHP_EOL;
+    $a = getScheduleForRouteIdDirectionIdPlaceCode($route_id, $direction_id, $place_code);
 //    echo ('Bus route: ' . $route . PHP_EOL);
 //    echo ('Bus stop: ' . $stop . PHP_EOL);
 //    echo ('Direction: ' . $direction . PHP_EOL);
@@ -39,6 +42,27 @@ function getDirectionIdForRouteIdAndDirection(string $route_id, string $directio
     $direction_id = ((array)$directions[(int)$f])['direction_id'];
 
     return $direction_id;
+
+}
+
+function getPlaceCodeForRouteIdDirectionIdAndPlaceDescription(string $route_id, int $direction_id, string $place_description) : string {
+    $curl = new Curl();
+
+    // TODO - should probably update this GET to use an array of params instead of just hardcoding link
+    $places = $curl->get('https://svc.metrotransit.org/nextripv2/stops/' . $route_id . '/' . $direction_id);
+
+    $f = array_search($place_description, array_column($places, 'description'));
+    return ((array)$places[$f])['place_code'];
+}
+
+function getScheduleForRouteIdDirectionIdPlaceCode(string $route_id, int $direction_id, string $place_code) : array {
+    $curl = new Curl();
+
+    // TODO - should probably update this GET to use an array of params instead of just hardcoding link
+    $schedule = $curl->get('https://svc.metrotransit.org/nextripv2/' . $route_id . '/' . $direction_id . '/' . $place_code);
+
+    var_dump($schedule);
+    return [];
 
 }
 
