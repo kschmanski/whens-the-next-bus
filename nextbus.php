@@ -13,7 +13,8 @@ function findNextBus(string $route, string $stop, string $direction) : void {
     $place_code = getPlaceCodeForRouteIdDirectionIdAndPlaceDescription($route_id, $direction_id, $stop);
     echo $place_code . PHP_EOL;
     $a = getScheduleForRouteIdDirectionIdPlaceCode($route_id, $direction_id, $place_code);
-//    echo ('Bus route: ' . $route . PHP_EOL);
+    echo $a['departure_text'] . PHP_EOL;
+    //    echo ('Bus route: ' . $route . PHP_EOL);
 //    echo ('Bus stop: ' . $stop . PHP_EOL);
 //    echo ('Direction: ' . $direction . PHP_EOL);
 }
@@ -61,9 +62,9 @@ function getScheduleForRouteIdDirectionIdPlaceCode(string $route_id, int $direct
     // TODO - should probably update this GET to use an array of params instead of just hardcoding link
     $schedule = $curl->get('https://svc.metrotransit.org/nextripv2/' . $route_id . '/' . $direction_id . '/' . $place_code);
 
-    var_dump($schedule);
-    return [];
 
+    var_dump(((array)$schedule)['departures']);
+    return (array)((array)$schedule)['departures'][0];
 }
 
 // Do some error handling in case we don't get enough args or too many args
