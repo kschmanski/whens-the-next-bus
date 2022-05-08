@@ -5,7 +5,6 @@ require __DIR__ . '/vendor/autoload.php';
 use Curl\Curl;
 
 class MetroTransitApiHandler {
-
     /**
      * @var Curl
      */
@@ -16,67 +15,114 @@ class MetroTransitApiHandler {
      */
     private $api_base_url = 'https://svc.metrotransit.org/nextripv2/';
 
+    /**
+     * Constructor. Instantiate the Curl object used for this Api handler.
+     */
     public function __construct() {
         $this->curl = new Curl();
     }
 
     /**
-     * @param string $route_label
-     * @return string
+     * Close the instance of Curl when we are done.
      */
-    public function findRouteIdForRouteLabel(string $route_label) : string {
-        // Update this to create a constant for the metro transit site
-        $bus_routes = $this->curl->get($this->api_base_url . 'routes');
-        $f = array_search($route_label, array_column($bus_routes, 'route_label'));
-
-        // This is so ugly, update this
-        $f = ((array)$bus_routes[(int)$f])['route_id'];
-        // Update this return type
-        return $f ?: 'none';
+    public function __destruct() {
+        $this->curl->close();
     }
 
     /**
+     * Return the Route ID for the passed in $route_label.
+     *
+     * @param string $route_label
+     *
+     * @return string
+     */
+    public function findRouteIdForRouteLabel(string $route_label) : ?string {
+        $all_routes = $this->curl->get($this->api_base_url . 'routes');
+
+        $route_id = null;
+
+        // Could use array_search and array_column here, but choosing to do it manually for readability
+        // For each possible route, find the one that matches the passed in $route_label
+        foreach ($all_routes as $route) {
+            if ($route->route_label == $route_label) {
+                $route_id = $route->route_id;
+                break;
+            }
+        }
+
+        if (is_null($route_id)) {
+            throw new Exception('Null Route ID');
+        }
+
+        return $route_id;
+    }
+
+    /**
+     * Return the Direction ID for the given $route_id and $direction_name.
+     *
      * @param string $route_id
      * @param string $direction_name
+     *
      * @return int
      */
     public function getDirectionIdForRouteIdAndDirection(string $route_id, string $direction_name) : int {
         $directions = $this->curl->get($this->api_base_url . 'directions/' . $route_id);
 
-        // Super ugly but it works (will get changed at some point)
-        $f = array_search($direction_name, array_column($directions, 'direction_name'));
+        $direction_id = null;
 
-        // Do some error checking here in case the direction doesn't exist
-        $direction_id = ((array)$directions[(int)$f])['direction_id'];
+        foreach ($directions as $direction) {
+            if ($direction->direction_name == $direction_name) {
+                $direction_id = $direction->direction_id;
+                break;
+            }
+        }
 
         return $direction_id;
     }
 
     /**
+     * Returns the Place Code for the passed in $route_id, $direction_id, and $place_description.
+     *
+     * For example, a Place Description might be 'VA Medical Center Station', for which the
+     * corresponding Place Code would be 'VAMC'.
+     *
      * @param string $route_id
      * @param int $direction_id
      * @param string $place_description
+     *
      * @return string
      */
     public function getPlaceCodeForRouteIdDirectionIdAndPlaceDescription(string $route_id, int $direction_id, string $place_description) : string {
         // TODO - should probably update this GET to use an array of params instead of just hardcoding link
         $places = $this->curl->get($this->api_base_url . 'stops/' . $route_id . '/' . $direction_id);
 
-        $f = array_search($place_description, array_column($places, 'description'));
-        return ((array)$places[$f])['place_code'];
+        $place_code = null;
+
+        foreach ($places as $place) {
+            if ($place->description == $place_description) {
+                $place_code = $place->place_code;
+                break;
+            }
+        }
+
+        return $place_code;
     }
 
     /**
+     * Returns the soonest Departure given the $route_id, $direction_id, and $place_code.
+     *
      * @param string $route_id
      * @param int $direction_id
      * @param string $place_code
-     * @return array
+     *
+     * @return stdClass
      */
-    public function getScheduleForRouteIdDirectionIdPlaceCode(string $route_id, int $direction_id, string $place_code) : array {
+    public function getSoonestDepartureForRouteIdDirectionIdPlaceCode(string $route_id, int $direction_id, string $place_code) : stdClass {
         // TODO - should probably update this GET to use an array of params instead of just hardcoding link
         $schedule = $this->curl->get($this->api_base_url . $route_id . '/' . $direction_id . '/' . $place_code);
-        
-        var_dump(((array)$schedule)['departures']);
-        return (array)((array)$schedule)['departures'][0];
+
+        $departures = $schedule->departures;
+
+        return $departures[0];
     }
 }
