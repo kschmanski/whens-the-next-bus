@@ -1,8 +1,9 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
+namespace src;
 
 use Curl\Curl;
+use stdClass;
 
 class MetroTransitApiHandler {
     /**

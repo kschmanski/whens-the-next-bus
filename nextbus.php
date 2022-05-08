@@ -2,10 +2,8 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-include 'MetroTransitApiHandler.php';
-
 function findNextBus(string $route_label, string $stop, string $direction) : void {
-    $api_handler = new MetroTransitApiHandler();
+    $api_handler = new \src\MetroTransitApiHandler();
 
     $route_id = $api_handler->findRouteIdForRouteLabel($route_label);
     $direction_name = ucfirst($direction) . 'bound';
