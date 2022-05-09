@@ -35,9 +35,9 @@ class MetroTransitApiHandler {
      *
      * @param string $route_label
      *
-     * @return string
+     * @return string|null
      */
-    public function findRouteIdForRouteLabel(string $route_label) : ?string {
+    public function getRouteIdForRouteLabel(string $route_label) : ?string {
         $all_routes = $this->curl->get($this->api_base_url . 'routes');
 
         $route_id = null;
@@ -51,10 +51,6 @@ class MetroTransitApiHandler {
             }
         }
 
-        if (is_null($route_id)) {
-            throw new Exception('Null Route ID');
-        }
-
         return $route_id;
     }
 
@@ -64,9 +60,9 @@ class MetroTransitApiHandler {
      * @param string $route_id
      * @param string $direction_name
      *
-     * @return int
+     * @return int|null
      */
-    public function getDirectionIdForRouteIdAndDirection(string $route_id, string $direction_name) : int {
+    public function getDirectionIdForRouteIdAndDirection(string $route_id, string $direction_name) : ?int {
         $directions = $this->curl->get($this->api_base_url . 'directions/' . $route_id);
 
         $direction_id = null;
@@ -91,9 +87,9 @@ class MetroTransitApiHandler {
      * @param int $direction_id
      * @param string $place_description
      *
-     * @return string
+     * @return string|null
      */
-    public function getPlaceCodeForRouteIdDirectionIdAndPlaceDescription(string $route_id, int $direction_id, string $place_description) : string {
+    public function getPlaceCodeForRouteIdDirectionIdAndPlaceDescription(string $route_id, int $direction_id, string $place_description) : ?string {
         // TODO - should probably update this GET to use an array of params instead of just hardcoding link
         $places = $this->curl->get($this->api_base_url . 'stops/' . $route_id . '/' . $direction_id);
 
