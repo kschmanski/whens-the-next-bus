@@ -3,7 +3,7 @@ A command-line tool interacting with the [Metro Transit API](https://svc.metrotr
 
 # Prerequisites
 System requirements are the following:
-* PHP > 7.3 
+* PHP >= 7.3 
   * This will likely work with any version of PHP > 7.0, but I tested this on a machine with PHP 7.3.29 installed 
   * Instructions for installing PHP are here: https://www.geeksforgeeks.org/how-to-install-php-on-macos/
 * Composer > 2.0
