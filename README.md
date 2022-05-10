@@ -21,7 +21,7 @@ composer install
 ```
 This should install the necessary libraries needed for this project, which are CURL and PHPUnit.
 
-#Usage
+# Usage
 The tool takes in three arguments:
 * Argument 1 is the Route name
 * Argument 2 is the Stop name
