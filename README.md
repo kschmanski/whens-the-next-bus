@@ -19,9 +19,18 @@ Then, run composer install from inside the `whens-the-next-bus` directory:
 ```bash
 composer install
 ```
-
 This should install the necessary libraries needed for this project, which are CURL and PHPUnit.
 
+#Usage
+The tool takes in three arguments:
+* Argument 1 is the Route name
+* Argument 2 is the Stop name
+* Argument 3 is the direction (north, south, east or west)
+
+Example:
+```bash
+php nextbus.php "METRO Blue Line" "Mall of America Station" "south"
+```
 # Unit tests
 To run the unit tests, run the following from your command line:
 ```bash
