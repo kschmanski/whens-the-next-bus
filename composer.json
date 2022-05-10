@@ -1,5 +1,11 @@
 {
     "require": {
-        "php-curl-class/php-curl-class": "9.6.*"
+        "php-curl-class/php-curl-class": "9.6.*",
+        "phpunit/phpunit": "^9"
+    },
+    "autoload": {
+        "classmap": [
+            "src"
+        ]
     }
 }
